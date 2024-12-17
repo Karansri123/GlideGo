@@ -1,31 +1,52 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
-// eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+  // eslint-disable-next-line no-unused-vars
+  import React, { useState, useContext } from 'react'
+  import { Link, useNavigate } from 'react-router-dom'
+  import axios from 'axios'
+  import { UserDataContext } from '../context/UserContext'
+  
+  
 
-const UserSignup = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [firstName,setFirstName] = useState("");
-  const [lastName,setLastName] = useState("");
-    // eslint-disable-next-line no-unused-vars
-    const [userData , setUserData] = useState({});
+  const UserSignup = () => {
+    const [ email, setEmail ] = useState('')
+    const [ password, setPassword ] = useState('')
+    const [ firstName, setFirstName ] = useState('')
+    const [ lastName, setLastName ] = useState('')
+    const [ userData, setUserData ] = useState({})
+  
+    const navigate = useNavigate()
+  
+  
+    const { user, setUser } = useContext(UserDataContext)
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    setUserData({
-      fullName:{
-        firstName:firstName,
-        lastName:lastName,
-      },
-      email: email,
-      password: password,
-    })
-    setEmail('');
-    setPassword('');
-    setFirstName('');
-    setLastName('');
-  };
+    const submitHandler = async (e) => {
+      e.preventDefault()
+      const newUser = {
+        fullname: {
+          firstname: firstName,
+          lastname: lastName
+        },
+        email: email,
+        password: password
+      }
+  
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
+  
+      if (response.status === 201) {
+        const data = response.data
+        setUser(data.user)
+        localStorage.setItem('token', data.token)
+        navigate('/home')
+      }
+  
+  
+      setEmail('')
+      setFirstName('')
+      setLastName('')
+      setPassword('')
+  
+    }
 
   return (
     <div>
@@ -67,8 +88,8 @@ const UserSignup = () => {
               type="email"
               placeholder="email@example.com"
               value={email}
-              onChange={(e)=>{
-                setEmail(e.target.value)
+              onChange={(e) => {
+                setEmail(e.target.value);
               }}
             />
 
@@ -79,13 +100,13 @@ const UserSignup = () => {
               type="password"
               placeholder="password"
               value={password}
-              onChange={(e)=>{
-                setPassword(e.target.value)
+              onChange={(e) => {
+                setPassword(e.target.value);
               }}
             />
 
             <button className="bg-[#111] text-white font-semibold mb-3 rounded px-4 py-2  w-full text-lg placeholder:text-base">
-              Login
+              Create Account
             </button>
           </form>
           <p className="text-center">

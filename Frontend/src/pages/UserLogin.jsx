@@ -1,7 +1,11 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserDataContext } from "../context/UserContext";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const UserLogin = () => {
   const [email,setEmail] = useState('');
@@ -9,12 +13,24 @@ const UserLogin = () => {
   // eslint-disable-next-line no-unused-vars
   const [userData , setUserData] = useState({})
 
-  const submitHandler = (e)=>{
+      const { user, setUser } = useContext(UserDataContext)
+      const navigate = useNavigate();
+
+  const submitHandler = async (e)=>{
     e.preventDefault();
-    setUserData({
+    const userData = {
       email:email,
       password:password
-    })
+    }
+
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData);
+    if (response.status === 200) {
+      const data = response.data
+      setUser(data.user)
+      localStorage.setItem('token', data.token)
+      navigate('/home')
+    }
+
     setEmail('');
     setPassword('')
   }
